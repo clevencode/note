@@ -1,36 +1,51 @@
 # Dashboard Institutionnel
 
-Painel em **https://note-sigma-bice.vercel.app** que recebe os resultados do quiz em **https://question-ecru-iota.vercel.app**.
+## O que era Vercel KV?
 
-## Sincronização
+**Vercel KV** é um banco de dados Redis pago/configurável no Vercel. Era necessário criar storage, conectar ao projeto e fazer redeploy — por isso o app pedia configuração.
 
-1. Aluno termina o quiz → resultado enviado via `POST /api/results`
-2. Dashboard busca dados via `GET /api/results`
-3. Atualização automática a cada 30 segundos
+**Substituímos por Supabase** (gratuito, mais simples).
 
-## Configuração no Vercel (obrigatório)
+## WiFi não funciona para rastrear alunos
 
-1. Abra o projeto **note** no [Vercel Dashboard](https://vercel.com)
-2. **Storage** → Create Database → **KV**
-3. Conecte o KV ao projeto **note**
-4. Redeploy o projeto
+Sites no navegador **não conseguem ver** a rede WiFi conectada (regra de segurança dos browsers). Cada celular/computador guarda dados separadamente.
 
-Sem o Vercel KV, a API retorna erro 503 e o dashboard não exibe dados.
+A solução correta é uma **nuvem compartilhada** (Supabase): o quiz envia o resultado e o dashboard lê de qualquer lugar.
 
-## Deploy
+## Configuração em 5 minutos (gratuito)
 
-```bash
-cd dashboard-institucional
-git push origin main
+### 1. Criar conta
+[supabase.com](https://supabase.com) → **New Project** (gratuito)
+
+### 2. Criar tabela
+**SQL Editor** → colar o conteúdo de `supabase-setup.sql` → **Run**
+
+### 3. Copiar credenciais
+**Settings** → **API**:
+- Project URL
+- `anon` `public` key
+
+### 4. Configurar os dois projetos
+Editar `js/cloud-config.js` em **ambos** os repositórios:
+
+```javascript
+const CLOUD_CONFIG = {
+  enabled: true,
+  supabaseUrl: 'https://SEU_PROJETO.supabase.co',
+  supabaseKey: 'SUA_ANON_KEY'
+};
 ```
 
-Vercel instala `@vercel/kv` automaticamente via `package.json`.
-
-## Desenvolvimento local
-
+### 5. Deploy
 ```bash
-npm install
-npx vercel dev
+git push   # nos dois repos (Question e note)
 ```
 
-O quiz em produção envia para `https://note-sigma-bice.vercel.app/api/results`.
+## Fluxo
+
+```
+Quiz (question-ecru-iota.vercel.app)
+  → envia resultado ao Supabase
+Dashboard (note-sigma-bice.vercel.app)
+  → lê resultados do Supabase
+```

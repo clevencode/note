@@ -122,7 +122,7 @@ async function refreshDashboard() {
     renderStats(entries);
     renderStudents(entries);
     renderAttempts(entries);
-    setSyncStatus(`Synchronisé — ${entries.length} résultat${entries.length !== 1 ? 's' : ''} depuis question-ecru-iota.vercel.app`);
+    setSyncStatus(`Synchronisé — ${entries.length} résultat${entries.length !== 1 ? 's' : ''} (quiz + Supabase)`);
   } catch (error) {
     renderStats([]);
     renderStudents([]);
