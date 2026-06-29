@@ -32,6 +32,13 @@ function getStats(entries) {
   };
 }
 
+function setSyncStatus(message, isError = false) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  el.textContent = message;
+  el.classList.toggle('sync-status--error', isError);
+}
+
 function renderStats(entries) {
   const stats = getStats(entries);
   document.getElementById('stat-students').textContent = stats.totalStudents;
@@ -107,19 +114,25 @@ function renderAttempts(entries) {
   `).join('');
 }
 
-function refreshDashboard() {
-  const entries = HistoryStore.load();
-  renderStats(entries);
-  renderStudents(entries);
-  renderAttempts(entries);
+async function refreshDashboard() {
+  setSyncStatus('Synchronisation…');
+
+  try {
+    const entries = await HistoryStore.fetchAll();
+    renderStats(entries);
+    renderStudents(entries);
+    renderAttempts(entries);
+    setSyncStatus(`Synchronisé — ${entries.length} résultat${entries.length !== 1 ? 's' : ''} depuis question-ecru-iota.vercel.app`);
+  } catch (error) {
+    renderStats([]);
+    renderStudents([]);
+    renderAttempts([]);
+    setSyncStatus(error.message || 'Erreur de synchronisation', true);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   refreshDashboard();
-
-  window.addEventListener('storage', e => {
-    if (e.key === HISTORY_KEY) refreshDashboard();
-  });
-
   document.getElementById('btn-refresh')?.addEventListener('click', refreshDashboard);
+  setInterval(refreshDashboard, 30000);
 });

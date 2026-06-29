@@ -1,15 +1,16 @@
-// storage.js — Mesma chave do quiz Technologie & IA
+// storage.js — Sincronização com API central (note-sigma-bice.vercel.app)
 
-const HISTORY_KEY = 'techIaQuizHistory';
+const SYNC_API = 'https://note-sigma-bice.vercel.app/api/results';
 
 const HistoryStore = {
-  load() {
-    try {
-      const raw = localStorage.getItem(HISTORY_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
+  async fetchAll() {
+    const res = await fetch(SYNC_API, { cache: 'no-store' });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Erreur ${res.status}`);
     }
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   }
 };
 

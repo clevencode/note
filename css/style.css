@@ -73,7 +73,17 @@ body {
   margin-bottom: 8px;
 }
 
-.hero__subtitle { font-size: 0.95rem; max-width: 520px; }
+.hero__subtitle { font-size: 0.95rem; max-width: 560px; }
+
+.sync-status {
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--blue);
+  letter-spacing: 0.04em;
+}
+
+.sync-status--error { color: #E50000; }
 
 .stats {
   display: grid;

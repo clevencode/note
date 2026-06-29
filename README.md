@@ -1,25 +1,36 @@
 # Dashboard Institutionnel
 
-Painel separado do quiz do aluno. Exibe nomes e desempenho dos resultados registrados.
+Painel em **https://note-sigma-bice.vercel.app** que recebe os resultados do quiz em **https://question-ecru-iota.vercel.app**.
 
-## Projeto independente
+## Sincronização
 
-Este dashboard **não faz parte** do projeto `quiz-technologie-ia` e não deve ser exibido aos alunos.
+1. Aluno termina o quiz → resultado enviado via `POST /api/results`
+2. Dashboard busca dados via `GET /api/results`
+3. Atualização automática a cada 30 segundos
 
-## Conexão de dados
+## Configuração no Vercel (obrigatório)
 
-Compartilha a chave `techIaQuizHistory` no `localStorage` com o quiz. Para funcionar, ambos devem rodar no **mesmo domínio**:
+1. Abra o projeto **note** no [Vercel Dashboard](https://vercel.com)
+2. **Storage** → Create Database → **KV**
+3. Conecte o KV ao projeto **note**
+4. Redeploy o projeto
+
+Sem o Vercel KV, a API retorna erro 503 e o dashboard não exibe dados.
+
+## Deploy
 
 ```bash
-cd C:\Users\Clevy
-npx serve .
+cd dashboard-institucional
+git push origin main
 ```
 
-- Quiz (aluno): `http://localhost:3000/quiz-technologie-ia/`
-- Dashboard (instituição): `http://localhost:3000/dashboard-institucional/`
+Vercel instala `@vercel/kv` automaticamente via `package.json`.
 
-## Conteúdo
+## Desenvolvimento local
 
-- Total de élèves, tentativas e média
-- Card por aluno: último score, melhor score, tentativas
-- Tabela com histórico completo
+```bash
+npm install
+npx vercel dev
+```
+
+O quiz em produção envia para `https://note-sigma-bice.vercel.app/api/results`.
